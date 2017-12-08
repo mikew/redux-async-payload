@@ -42,7 +42,7 @@ This will dispatch 3 actions, in this order:
 npm install --save-dev redux-async-payload
 ```
 
-```javascript
+```typescript
 import {
   applyMiddleware,
   createStore,
@@ -50,4 +50,14 @@ import {
 import reduxAsyncPayload from 'redux-async-payload'
 
 const configureStore = applyMiddleware(reduxAsyncPayload({}))(createStore)
+
+// Options are
+interface MiddlewareOptions {
+  delimiter?: string,
+  suffixes?: {
+    start?: string,
+    success?: string,
+    error?: string,
+  },
+}
 ```
