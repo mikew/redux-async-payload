@@ -11,7 +11,7 @@ export interface MiddlewareOptions {
   },
 }
 
-interface FluxAction extends Action {
+export interface FluxAction extends Action {
   payload?: any
   meta?: any
   error?: boolean
@@ -147,17 +147,17 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
 
 // Dispatch, MiddlewareAPI, and Middleware are from the upcoming redux@4.0,
 // which is mostly just better TypeScript types.
-interface Dispatch<D = Action> {
+export interface Dispatch<D = Action> {
   // tslint:disable-next-line:callable-types
   <A extends D>(action: A): A
 }
 
-interface MiddlewareAPI<S = any, D = Action> {
+export interface MiddlewareAPI<S = any, D = Action> {
   dispatch: Dispatch<D>
   getState(): S
 }
 
-interface Middleware {
+export interface Middleware {
   // tslint:disable-next-line:callable-types
   (store: MiddlewareAPI<any, FluxAction>): (next: Dispatch<FluxAction>) => Dispatch<FluxAction>
 }

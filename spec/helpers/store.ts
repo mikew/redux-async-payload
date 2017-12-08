@@ -1,8 +1,19 @@
+// Some of these imports are just needed so there's no error with
+// `createWithMiddleware`.
+// See https://github.com/Microsoft/TypeScript/issues/5711
 import {
   Action,
+  // @ts-ignore
+  AnyAction,
   applyMiddleware,
   createStore,
+  // @ts-ignore
+  GenericStoreEnhancer,
   Middleware,
+  // @ts-ignore
+  Reducer,
+  // @ts-ignore
+  Store,
 } from 'redux'
 
 // tslint:disable-next-line:import-name
