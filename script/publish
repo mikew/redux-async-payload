@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -ex
+
+./script/lint
+./script/test
+./node_modules/.bin/tsc
+
+# npm publish

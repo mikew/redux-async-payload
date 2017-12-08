@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -x
+
+if [ "$CI" = true ]; then
+  exec ./node_modules/.bin/mocha \
+    --require ts-node/register \
+    --full-trace \
+    --exit \
+    'spec/helpers/setup.ts' \
+    'spec/**/*.ts'
+fi
+
+exec ./node_modules/.bin/mocha \
+  --inspect=9241 \
+  --require ts-node/register \
+  --full-trace \
+  --watch \
+  --watch-extensions ts,tsx,js,jsx,json \
+  'spec/helpers/setup.ts' \
+  'spec/**/*.ts'

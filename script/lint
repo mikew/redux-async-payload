@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+exec ./node_modules/.bin/tslint 'src/**/*.ts' 'spec/**/*.ts'

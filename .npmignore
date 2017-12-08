@@ -1,0 +1,7 @@
+.vscode/
+tslint.json
+tsconfig.json
+spec/
+src/
+script/
+lib/spec/
