@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -x
 
+export REDUX_ASYNC_PAYLOAD_TEST=true
+
 if [ "$CI" = true ]; then
   exec ./node_modules/.bin/mocha \
     --require ts-node/register \

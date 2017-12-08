@@ -124,6 +124,10 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       try {
         result = action.payload(store.dispatch, store.getState)
       } catch (err) {
+        if (process.env.REDUX_ASYNC_PAYLOAD_TEST !== 'true') {
+          // tslint:disable-next-line:no-console
+          console.error(err)
+        }
         dispatchRejectedAction(err)
 
         return
