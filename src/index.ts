@@ -45,15 +45,19 @@ function isPromise(promiseLike: any): boolean {
  * @param {MiddlewareOptions} options
  * @returns {Middleware}
  */
-export default function asyncAwaitMiddleware(options: MiddlewareOptions): Middleware {
+export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middleware {
   // Merge given options and our defaults.
-  const opts = {
-    ...defaultOptions,
-    ...options,
-  }
-  opts.suffixes = {
-    ...defaultOptions.suffixes,
-    ...options.suffixes,
+  let opts: MiddlewareOptions = defaultOptions
+
+  if (options) {
+    opts = {
+      ...defaultOptions,
+      ...options,
+    }
+    opts.suffixes = {
+      ...defaultOptions.suffixes,
+      ...options.suffixes,
+    }
   }
 
   return (store) => (dispatch) => (action) => {

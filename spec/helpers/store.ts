@@ -17,7 +17,7 @@ const logger: Middleware = () => (next) => (action) => {
 }
 
 export const createWithMiddleware = applyMiddleware(
-  middleware({}),
+  middleware(),
   logger,
 )(createStore)
 
