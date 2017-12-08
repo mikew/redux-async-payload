@@ -21,10 +21,10 @@ import middleware from '../../src/index'
 
 const actionHistory: Action[] = []
 
-const logger: Middleware = () => (next) => (action) => {
+const logger: Middleware = () => (dispatch) => (action) => {
   actionHistory.push(action)
 
-  return next(action)
+  return dispatch(action)
 }
 
 export const createWithMiddleware = applyMiddleware(
