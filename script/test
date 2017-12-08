@@ -2,6 +2,7 @@
 set -x
 
 export REDUX_ASYNC_PAYLOAD_TEST=true
+export TS_NODE_PROJECT=tsconfig.test.json
 
 if [ "$CI" = true ]; then
   exec ./node_modules/.bin/mocha \
