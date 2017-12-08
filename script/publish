@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -ex
 
+rm -rf lib/
 ./script/lint
-./script/test
+CI=true ./script/test
 ./node_modules/.bin/tsc
 
-# npm publish
+npm publish
