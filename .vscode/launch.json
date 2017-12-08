@@ -7,15 +7,6 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "Attch to Server (:9240)",
-      "restart": true,
-      "sourceMaps": true,
-      "showAsyncStacks": true,
-      "port": 9240
-    },
-    {
-      "type": "node",
-      "request": "attach",
       "name": "Attch to Tests (:9241)",
       "restart": true,
       "sourceMaps": true,
