@@ -17,7 +17,7 @@ import {
 } from 'redux'
 
 // tslint:disable-next-line:import-name
-import middleware from '../../src/index'
+import middleware from '../../index'
 
 const actionHistory: Action[] = []
 

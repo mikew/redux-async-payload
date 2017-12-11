@@ -4,7 +4,7 @@ import {
   clearActionHistory,
   createWithMiddleware,
   getActionHistory,
-} from './helpers/store'
+} from './spec/helpers/store'
 
 describe('Async/Await Middleware', () => {
   beforeEach(clearActionHistory)
