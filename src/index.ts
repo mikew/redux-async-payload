@@ -99,8 +99,11 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       })
     }
 
-    // Return if there is no payload.
-    if (!action.payload) {
+    // Return if there is no action or payload.
+    if (
+      !action
+      || !action.payload
+    ) {
       return dispatch(action)
     }
 

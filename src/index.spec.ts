@@ -9,6 +9,14 @@ import {
 describe('Async/Await Middleware', () => {
   beforeEach(clearActionHistory)
 
+  it('works when action is null', () => {
+    const store = createWithMiddleware((state) => state)
+
+    store.dispatch(null as any)
+    store.dispatch(undefined as any)
+    store.dispatch(0 as any)
+  })
+
   describe('Success', () => {
     it('Works with function payload', async () => {
       const store = createWithMiddleware((state) => state)

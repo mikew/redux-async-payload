@@ -22,6 +22,10 @@ import middleware from '../../index'
 const actionHistory: Action[] = []
 
 const logger: Middleware = () => (dispatch) => (action) => {
+  if (!action) {
+    return dispatch({ type: 'undefined' } as any)
+  }
+
   actionHistory.push(action)
 
   return dispatch(action)
