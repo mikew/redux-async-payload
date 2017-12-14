@@ -122,17 +122,23 @@ describe('Async/Await Middleware', () => {
   describe('Error', () => {
     it('Works with function payload', async () => {
       const store = createWithMiddleware((state) => state)
+      let didCatchError = false
 
-      await store.dispatch({
-        type: 'foo',
-        payload(dispatch: Dispatch<any>) {
-          dispatch({ type: 'OMG' })
-          throw new Error('the error message')
-        },
-      })
+      try {
+        await store.dispatch({
+          type: 'foo',
+          payload(dispatch: Dispatch<any>) {
+            dispatch({ type: 'OMG' })
+            throw new Error('the error message')
+          },
+        })
+      } catch (err) {
+        didCatchError = true
+      }
 
       const actionHistory = getActionHistory()
 
+      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 3)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',
@@ -152,14 +158,20 @@ describe('Async/Await Middleware', () => {
 
     it('Works with a promise payload', async () => {
       const store = createWithMiddleware((state) => state)
+      let didCatchError = false
 
-      await store.dispatch({
-        type: 'foo',
-        payload: Promise.reject(new Error('the error message')),
-      })
+      try {
+        await store.dispatch({
+          type: 'foo',
+          payload: Promise.reject(new Error('the error message')),
+        })
+      } catch (err) {
+        didCatchError = true
+      }
 
       const actionHistory = getActionHistory()
 
+      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',
@@ -176,19 +188,25 @@ describe('Async/Await Middleware', () => {
 
     it('Works with an async function', async () => {
       const store = createWithMiddleware((state) => state)
+      let didCatchError = false
 
-      await store.dispatch({
-        type: 'foo',
-        async payload(dispatch: Dispatch<any>) {
-          const result = await Promise.reject(new Error('the error message'))
-          dispatch({ type: 'OMG', payload: result })
+      try {
+        await store.dispatch({
+          type: 'foo',
+          async payload(dispatch: Dispatch<any>) {
+            const result = await Promise.reject(new Error('the error message'))
+            dispatch({ type: 'OMG', payload: result })
 
-          return 'foo'
-        },
-      })
+            return 'foo'
+          },
+        })
+      } catch (err) {
+        didCatchError = true
+      }
 
       const actionHistory = getActionHistory()
 
+      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',

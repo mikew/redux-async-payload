@@ -3,12 +3,15 @@ import {
 } from 'redux'
 
 export interface MiddlewareOptions {
-  delimiter?: string,
-  suffixes?: {
-    start?: string,
-    success?: string,
-    error?: string,
-  },
+  delimiter?: string
+  throwOriginalError: boolean
+  suffixes?: MiddlewareSuffixes
+}
+
+export interface MiddlewareSuffixes {
+  start?: string
+  success?: string
+  error?: string
 }
 
 export interface FluxAction extends Action {
@@ -19,6 +22,7 @@ export interface FluxAction extends Action {
 
 const defaultOptions: MiddlewareOptions = {
   delimiter: '/',
+  throwOriginalError: true,
   suffixes: {
     start: 'start',
     success: 'success',
@@ -99,6 +103,24 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       })
     }
 
+    /**
+     * Attaches fulfilled / error handlers to a promise while still throwing
+     * the original error.
+     * @param {Promise<any>} promise
+     * @returns {Promise<any>}
+     */
+    function attachHandlers(promise: Promise<any>) {
+      return promise
+        .then(dispatchFulfilledAction)
+        .catch((err) => {
+          dispatchRejectedAction(err)
+
+          if (opts.throwOriginalError) {
+            throw err
+          }
+        })
+    }
+
     // Return if there is no action or payload.
     if (
       !action
@@ -113,7 +135,7 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
     if (isPromise(action.payload)) {
       dispatchPendingAction()
 
-      return action.payload.then(dispatchFulfilledAction, dispatchRejectedAction)
+      return attachHandlers(action.payload)
     }
 
     // If the payload is a function dispatch the start action and call the
@@ -127,20 +149,18 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       try {
         result = action.payload(store.dispatch, store.getState)
       } catch (err) {
-        if (process.env.REDUX_ASYNC_PAYLOAD_TEST !== 'true') {
-          // tslint:disable-next-line:no-console
-          console.error(err)
-        }
         dispatchRejectedAction(err)
 
-        return
+        if (opts.throwOriginalError) {
+          throw err
+        }
       }
 
       if (!isPromise(result)) {
         result = Promise.resolve(result)
       }
 
-      return result.then(dispatchFulfilledAction, dispatchRejectedAction)
+      return attachHandlers(result) as any
     }
 
     // Just pass the action along if we've somehow gotten here.
