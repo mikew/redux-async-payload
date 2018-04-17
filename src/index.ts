@@ -81,7 +81,7 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      * @param {any} payload
      */
     function dispatchFulfilledAction(payload: any) {
-      store.dispatch({
+      return store.dispatch({
         payload,
         type: `${action.type}${opts.delimiter}${opts.suffixes!.success}`,
         error: false,
@@ -101,6 +101,10 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
         error: true,
         meta: action.meta,
       })
+
+      if (opts.throwOriginalError) {
+        throw err
+      }
     }
 
     /**
@@ -112,13 +116,7 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
     function attachHandlers(promise: Promise<any>) {
       return promise
         .then(dispatchFulfilledAction)
-        .catch((err) => {
-          dispatchRejectedAction(err)
-
-          if (opts.throwOriginalError) {
-            throw err
-          }
-        })
+        .catch(dispatchRejectedAction)
     }
 
     // Return if there is no action or payload.
@@ -150,10 +148,6 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
         result = action.payload(store.dispatch, store.getState)
       } catch (err) {
         dispatchRejectedAction(err)
-
-        if (opts.throwOriginalError) {
-          throw err
-        }
       }
 
       if (!isPromise(result)) {

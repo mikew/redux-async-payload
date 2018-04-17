@@ -21,7 +21,7 @@ describe('Async/Await Middleware', () => {
     it('Works with function payload', async () => {
       const store = createWithMiddleware((state) => state)
 
-      await store.dispatch({
+      const result = await store.dispatch({
         type: 'foo',
         payload(dispatch: Dispatch<any>) {
           dispatch({ type: 'OMG' })
@@ -47,12 +47,18 @@ describe('Async/Await Middleware', () => {
         error: false,
         meta: undefined,
       })
+      assert.deepStrictEqual(result, {
+        type: 'foo/success',
+        payload: 'foo',
+        error: false,
+        meta: undefined,
+      })
     })
 
     it('Works with a regular payload', async () => {
       const store = createWithMiddleware((state) => state)
 
-      await store.dispatch({ type: 'OMG' })
+      const result = await store.dispatch({ type: 'OMG' })
 
       const actionHistory = getActionHistory()
 
@@ -60,12 +66,15 @@ describe('Async/Await Middleware', () => {
       assert.deepStrictEqual(actionHistory[0], {
         type: 'OMG',
       })
+      assert.deepStrictEqual(result, {
+        type: 'OMG',
+      })
     })
 
     it('Works with a promise payload', async () => {
       const store = createWithMiddleware((state) => state)
 
-      await store.dispatch({
+      const result = await store.dispatch({
         type: 'foo',
         payload: Promise.resolve('foo'),
       })
@@ -84,16 +93,22 @@ describe('Async/Await Middleware', () => {
         error: false,
         meta: undefined,
       })
+      assert.deepStrictEqual(result, {
+        type: 'foo/success',
+        payload: 'foo',
+        error: false,
+        meta: undefined,
+      })
     })
 
     it('Works with an async function', async () => {
       const store = createWithMiddleware((state) => state)
 
-      await store.dispatch({
+      const result = await store.dispatch({
         type: 'foo',
         async payload(dispatch: Dispatch<any>) {
-          const result = await Promise.resolve(42)
-          dispatch({ type: 'OMG', payload: result })
+          const payload = await Promise.resolve(42)
+          dispatch({ payload, type: 'OMG' })
 
           return 'foo'
         },
@@ -112,6 +127,12 @@ describe('Async/Await Middleware', () => {
         payload: 42,
       })
       assert.deepStrictEqual(actionHistory[2], {
+        type: 'foo/success',
+        payload: 'foo',
+        error: false,
+        meta: undefined,
+      })
+      assert.deepStrictEqual(result, {
         type: 'foo/success',
         payload: 'foo',
         error: false,
