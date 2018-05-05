@@ -1,5 +1,6 @@
 import {
   Action,
+  Middleware,
 } from 'redux'
 
 export interface MiddlewareOptions {
@@ -32,8 +33,6 @@ const defaultOptions: MiddlewareOptions = {
 
 /**
  * Checks if the argument given is a Promise or Promise-like object.
- * @param {any} promiseLike
- * @returns {boolean}
  */
 function isPromise(promiseLike: any): boolean {
   if (promiseLike && typeof promiseLike.then === 'function') {
@@ -45,9 +44,6 @@ function isPromise(promiseLike: any): boolean {
 
 /**
  * Middleware adding native async / await support to Redux.
- * @export
- * @param {MiddlewareOptions} options
- * @returns {Middleware}
  */
 export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middleware {
   // Merge given options and our defaults.
@@ -174,27 +170,10 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
         result = Promise.resolve(result)
       }
 
-      return attachHandlers(result) as any
+      return attachHandlers(result)
     }
 
     // Just pass the action along if we've somehow gotten here.
     return dispatch(action)
   }
-}
-
-// Dispatch, MiddlewareAPI, and Middleware are from the upcoming redux@4.0,
-// which is mostly just better TypeScript types.
-export interface Dispatch<D = Action> {
-  // tslint:disable-next-line:callable-types
-  <A extends D>(action: A): A
-}
-
-export interface MiddlewareAPI<S = any, D = Action> {
-  dispatch: Dispatch<D>
-  getState(): S
-}
-
-export interface Middleware {
-  // tslint:disable-next-line:callable-types
-  (store: MiddlewareAPI<any, FluxAction>): (next: Dispatch<FluxAction>) => Dispatch<FluxAction>
 }
