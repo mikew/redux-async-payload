@@ -21,11 +21,13 @@ export interface FluxAction extends Action {
   error?: boolean
 }
 
+// tslint:disable:no-shadowed-variable
 export type PayloadType<T> =
   T extends (...args: any[]) => Promise<infer U> ? U
   : T extends (...args: any[]) => infer U ? U
   : T extends Promise<infer U> ? U
   : T
+// tslint:enable:no-shadowed-variable
 
 const defaultOptions: MiddlewareOptions = {
   delimiter: '/',
