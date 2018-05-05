@@ -66,9 +66,29 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
 
   return (store) => (dispatch) => (action) => {
     /**
+     * Check if start / success actions should be skipped.
+     */
+    function shouldSkipOuter() {
+      if (
+        action
+        && action.meta
+        && action.meta.asyncPayload
+        && action.meta.asyncPayload.skipOuter
+      ) {
+        return true
+      }
+
+      return false
+    }
+
+    /**
      * Dispatches the start action.
      */
     function dispatchPendingAction() {
+      if (shouldSkipOuter()) {
+        return
+      }
+
       dispatch({
         type: `${action.type}${opts.delimiter}${opts.suffixes!.start}`,
         error: action.error,
@@ -78,9 +98,12 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
 
     /**
      * Dispatches the success action and passes the payload along.
-     * @param {any} payload
      */
     function dispatchFulfilledAction(payload: any) {
+      if (shouldSkipOuter()) {
+        return
+      }
+
       return store.dispatch({
         payload,
         type: `${action.type}${opts.delimiter}${opts.suffixes!.success}`,
@@ -92,7 +115,6 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
     /**
      * Dispatches the error action, sets `error` to `true`, and passes the
      * error as the payload.
-     * @param {Error} err
      */
     function dispatchRejectedAction(err: Error) {
       store.dispatch({
@@ -110,10 +132,8 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
     /**
      * Attaches fulfilled / error handlers to a promise while still throwing
      * the original error.
-     * @param {Promise<any>} promise
-     * @returns {Promise<any>}
      */
-    function attachHandlers(promise: Promise<any>) {
+    function attachHandlers(promise: Promise<any>): Promise<any> {
       return promise
         .then(dispatchFulfilledAction)
         .catch(dispatchRejectedAction)

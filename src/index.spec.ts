@@ -139,7 +139,34 @@ describe('Async/Await Middleware', () => {
         meta: undefined,
       })
     })
+
+    it('Can skip start / success actions', async () => {
+      const store = createWithMiddleware((state) => state)
+
+      const result = await store.dispatch({
+        type: 'foo',
+        async payload(dispatch: Dispatch<any>) {
+          const payload = await Promise.resolve(42)
+          dispatch({ payload, type: 'OMG' })
+        },
+        meta: {
+          asyncPayload: {
+            skipOuter: true,
+          },
+        },
+      })
+
+      const actionHistory = getActionHistory()
+
+      assert.equal(actionHistory.length, 1)
+      assert.deepStrictEqual(actionHistory[0], {
+        type: 'OMG',
+        payload: 42,
+      })
+      assert.equal(result, undefined)
+    })
   })
+
   describe('Error', () => {
     it('Works with function payload', async () => {
       const store = createWithMiddleware((state) => state)
