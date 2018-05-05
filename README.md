@@ -113,6 +113,6 @@ store.dispatch({
 
 ### Awaiting dispatch
 
-`dispatch()` now returns `Promise<any>` (or `Promise<undefined>` when using
-`skipOuter`). That means that you can `await` it when dispatching your
-actions throughout the code, enabling more ways of using async actions.
+`dispatch()` now returns `Promise<any>`. That means that you can `await` it
+when dispatching your actions throughout your code, enabling more ways of
+combining async actions.

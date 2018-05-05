@@ -97,7 +97,7 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      */
     function dispatchFulfilledAction(payload: any) {
       if (shouldSkipOuter()) {
-        return
+        return payload
       }
 
       return store.dispatch({

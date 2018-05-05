@@ -148,6 +148,8 @@ describe('Async/Await Middleware', () => {
         async payload(dispatch: Dispatch<any>) {
           const payload = await Promise.resolve(42)
           dispatch({ payload, type: 'OMG' })
+
+          return 'foo'
         },
         meta: {
           asyncPayload: {
@@ -163,7 +165,7 @@ describe('Async/Await Middleware', () => {
         type: 'OMG',
         payload: 42,
       })
-      assert.equal(result, undefined)
+      assert.equal(result, 'foo')
     })
   })
 
