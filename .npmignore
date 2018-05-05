@@ -3,7 +3,7 @@ tslint.json
 tsconfig.json
 spec/
 *.spec.js
-*.spec.js.map
+*.js.map
 *.spec.d.ts
 src/
 script/
