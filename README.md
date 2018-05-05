@@ -31,7 +31,7 @@ This will dispatch 3 actions, in this order:
     "payload": ["results of your api call"]
   },
   {
-    "type": "fetchResults/finish",
+    "type": "fetchResults/success",
   },
 ]
 ```
@@ -61,3 +61,58 @@ interface MiddlewareOptions {
   },
 }
 ```
+
+## Features
+
+### Handle payload as Promise instead of async function.
+
+The payload can be a Promise. This will also dispatch the `/start` and
+`/success` actions:
+
+```typescript
+dispatch({
+  type: 'fetchResults',
+  payload: someApiCall(),
+})
+```
+
+### Passing data to `/success` action
+
+No matter what you initially pass as a payload, the `/success` action will receive the result of it should you want to do anything with it in a reducer or at the point of dispatching:
+
+```typescript
+dispatch({ payload: Promise.resolve(42), type: 'fetchResults' })
+// { payload: 42, type: 'fetchResults/success }
+
+dispatch({ async payload() { return 42 }, type: 'fetchResults' })
+// { payload: 42, type: 'fetchResults/success }
+
+dispatch({ payload() { return 42 }, type: 'fetchResults' })
+// { payload: 42, type: 'fetchResults/success }
+```
+
+### Skip `/start` and `/success` actions
+
+These actions are dispatched by the middleware when the payload is either a
+Function or a Promise. You can skip them by adding metadata to your action.
+This acts more like redux-thunk without having to install both middleware:
+
+```typescript
+store.dispatch({
+  type: 'foo',
+  payload(dispatch) {
+    dispatch(/* */)
+  },
+  meta: {
+    asyncPayload: {
+      skipOuter: true,
+    },
+  },
+})
+```
+
+### Awaiting dispatch
+
+`dispatch()` now returns `Promise<any>` (or `Promise<undefined>` when using
+`skipOuter`). That means that you can `await` it when dispatching your
+actions throughout the code, enabling more ways of using async actions.
