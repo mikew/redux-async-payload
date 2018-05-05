@@ -116,3 +116,28 @@ store.dispatch({
 `dispatch()` now returns `Promise<any>`. That means that you can `await` it
 when dispatching your actions throughout your code, enabling more ways of
 combining async actions.
+
+### `PayloadType<T>` for TypeScript
+
+Combined with `ReturnType<T>` the types of your actions and their async
+payloads can be inferred with just a reference to the action creator. See
+[redux-ts-helpers](https://www.npmjs.com/package/redux-ts-helpers#utils) if
+you'd like other utilities for TypeScript.
+
+```typescript
+function reducer(state = initialState, action: AnyAction) {
+  switch(action.type) {
+    case `${actions.constants.myAction}/success`: {
+      // Cast the action to the return type of its creator. This gets the bulk
+      // of the interface for you, like any meta / payload / other data you
+      // might set.
+      action = action as ReturnType<typeof actions.myAction>
+      // Disambiguate the payload.
+      const payload = action.payload as PayloadType<action.payload>
+      return { ...state }
+    }
+
+    return state
+  }
+}
+```

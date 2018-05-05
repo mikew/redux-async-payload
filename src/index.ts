@@ -21,6 +21,12 @@ export interface FluxAction extends Action {
   error?: boolean
 }
 
+export type PayloadType<T> =
+  T extends (...args: any[]) => Promise<infer U> ? U
+  : T extends (...args: any[]) => infer U ? U
+  : T extends Promise<infer U> ? U
+  : T
+
 const defaultOptions: MiddlewareOptions = {
   delimiter: '/',
   throwOriginalError: true,
