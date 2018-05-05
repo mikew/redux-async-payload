@@ -1,18 +1,10 @@
-// Some of these imports are just needed so there's no error with
-// `createWithMiddleware`.
-// See https://github.com/Microsoft/TypeScript/issues/5711
 import {
   Action,
-  // @ts-ignore
   AnyAction,
   applyMiddleware,
   createStore,
-  // @ts-ignore
-  GenericStoreEnhancer,
   Middleware,
-  // @ts-ignore
   Reducer,
-  // @ts-ignore
   Store,
 } from 'redux'
 
@@ -31,10 +23,14 @@ const logger: Middleware = () => (dispatch) => (action) => {
   return dispatch(action)
 }
 
-export const createWithMiddleware = applyMiddleware(
-  middleware(),
-  logger,
-)(createStore)
+export const createWithMiddleware = (
+  reducer: Reducer<any, AnyAction>,
+): Store<any, AnyAction> => {
+  return createStore(reducer, applyMiddleware(
+    middleware(),
+    logger,
+  ))
+}
 
 export function clearActionHistory() {
   while (actionHistory.length) {
