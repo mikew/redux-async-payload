@@ -29,6 +29,26 @@ export type PayloadType<T> =
   : T
 // tslint:enable:no-shadowed-variable
 
+type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+
+export type ActionStartType<
+  F extends (...args: any[]) => { payload: any }
+> = Omit<ReturnType<F>, 'payload'>
+
+export type ActionSuccessType<
+  F extends (...args: any[]) => { payload: any }
+> = Omit<ReturnType<F>, 'payload'> & {
+  payload: PayloadType<ReturnType<F>['payload']>
+  error: false,
+}
+
+export type ActionErrorType<
+  F extends (...args: any[]) => { payload: any }
+> = Omit<ReturnType<F>, 'payload'> & {
+  payload: string
+  error: true,
+}
+
 const defaultOptions: MiddlewareOptions = {
   delimiter: '/',
   throwOriginalError: true,
