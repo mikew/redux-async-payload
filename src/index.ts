@@ -23,13 +23,19 @@ export interface FluxAction extends Action {
 
 // tslint:disable:no-shadowed-variable
 export type PayloadType<T> =
-  T extends (...args: any[]) => Promise<infer U> ? U
-  : T extends (...args: any[]) => infer U ? U
-  : T extends Promise<infer U> ? U
-  : T
+  // If T is a function that returns a promise, infer U from Promise.
+  T extends (...args: any[]) => Promise<infer U>
+    ? U
+    // If T is a function, infer U from its return type
+    : T extends (...args: any[]) => infer U
+      ? U
+      // If T is just a promise, infer U.
+      : T extends Promise<infer U>
+        ? U
+        : T
 // tslint:enable:no-shadowed-variable
 
-type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
 export type ActionStartType<
   F extends (...args: any[]) => { payload: any }
