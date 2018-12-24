@@ -95,6 +95,8 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
   }
 
   return (store) => (dispatch) => (action) => {
+    let didError = false
+
     /**
      * Check if start / success actions should be skipped.
      */
@@ -130,6 +132,10 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      * Dispatches the success action and passes the payload along.
      */
     function dispatchFulfilledAction(payload: any) {
+      if (didError) {
+        return
+      }
+
       if (shouldSkipOuter()) {
         return payload
       }
@@ -147,7 +153,9 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      * error as the payload.
      */
     function dispatchRejectedAction(err: Error) {
-      store.dispatch({
+      didError = true
+
+      const result = store.dispatch({
         type: `${action.type}${opts.delimiter}${opts.suffixes!.error}`,
         payload: (err.message || err || '').toString(),
         error: true,
@@ -157,6 +165,8 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       if (opts.throwOriginalError) {
         throw err
       }
+
+      return result
     }
 
     /**
@@ -197,7 +207,11 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
       try {
         result = action.payload(store.dispatch, store.getState)
       } catch (err) {
-        dispatchRejectedAction(err)
+        const errorResult = dispatchRejectedAction(err)
+
+        if (!opts.throwOriginalError) {
+          return errorResult
+        }
       }
 
       if (!isPromise(result)) {
