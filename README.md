@@ -15,7 +15,7 @@ store.dispatch({
       type: 'recordResults',
       payload: results,
     })
-  }
+  },
 })
 ```
 
@@ -24,15 +24,15 @@ This will dispatch 3 actions, in this order:
 ```json
 [
   {
-    "type": "fetchResults/start",
+    "type": "fetchResults/start"
   },
   {
     "type": "recordResults",
     "payload": ["results of your api call"]
   },
   {
-    "type": "fetchResults/success",
-  },
+    "type": "fetchResults/success"
+  }
 ]
 ```
 
@@ -43,22 +43,19 @@ npm install --save-dev redux-async-payload
 ```
 
 ```typescript
-import {
-  applyMiddleware,
-  createStore,
-} from 'redux'
+import { applyMiddleware, createStore } from 'redux'
 import reduxAsyncPayload from 'redux-async-payload'
 
 const configureStore = applyMiddleware(reduxAsyncPayload({}))(createStore)
 
 // Options are
 interface MiddlewareOptions {
-  delimiter?: string,
+  delimiter?: string
   suffixes?: {
-    start?: string,
-    success?: string,
-    error?: string,
-  },
+    start?: string
+    success?: string
+    error?: string
+  }
 }
 ```
 
@@ -84,10 +81,20 @@ No matter what you initially pass as a payload, the `/success` action will recei
 dispatch({ payload: Promise.resolve(42), type: 'fetchResults' })
 // { payload: 42, type: 'fetchResults/success }
 
-dispatch({ async payload() { return 42 }, type: 'fetchResults' })
+dispatch({
+  async payload() {
+    return 42
+  },
+  type: 'fetchResults',
+})
 // { payload: 42, type: 'fetchResults/success }
 
-dispatch({ payload() { return 42 }, type: 'fetchResults' })
+dispatch({
+  payload() {
+    return 42
+  },
+  type: 'fetchResults',
+})
 // { payload: 42, type: 'fetchResults/success }
 ```
 
@@ -117,27 +124,37 @@ store.dispatch({
 when dispatching your actions throughout your code, enabling more ways of
 combining async actions.
 
-### `PayloadType<T>` for TypeScript
+### Types for reducers
 
-Combined with `ReturnType<T>` the types of your actions and their async
-payloads can be inferred with just a reference to the action creator. See
-[redux-ts-helpers](https://www.npmjs.com/package/redux-ts-helpers#utils) if
-you'd like other utilities for TypeScript.
+`redux-async-payload` comes with `ActionStartType`, `ActionSuccessType`, and `ActionErrorType`.
 
 ```typescript
 function reducer(state = initialState, action: AnyAction) {
-  switch(action.type) {
-    case `${actions.constants.myAction}/success`: {
-      // Cast the action to the return type of its creator. This gets the bulk
-      // of the interface for you, like any meta / payload / other data you
-      // might set.
-      action = action as ReturnType<typeof actions.myAction>
-      // Disambiguate the payload.
-      const payload = action.payload as PayloadType<action.payload>
-      return { ...state }
+  switch (action.type) {
+    case `${actions.constants.myAction}/start`: {
+      action = action as ActionStartType<typeof actions.myAction>
+
+      return {
+        ...state,
+      }
     }
 
-    return state
+    case `${actions.constants.myAction}/success`: {
+      action = action as ActionSuccessType<typeof actions.myAction>
+      return {
+        ...state,
+      }
+    }
+
+    case `${actions.constants.myAction}/error`:
+      {
+        action = action as ActionErrorType<typeof actions.myAction>
+        return {
+          ...state,
+        }
+      }
+
+      return state
   }
 }
 ```

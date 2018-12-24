@@ -1,7 +1,4 @@
-import {
-  Action,
-  Middleware,
-} from 'redux'
+import { Action, Middleware } from 'redux'
 
 export interface MiddlewareOptions {
   delimiter?: string
@@ -21,19 +18,15 @@ export interface FluxAction extends Action {
   error?: boolean
 }
 
-// tslint:disable:no-shadowed-variable
 export type PayloadType<T> =
   // If T is a function that returns a promise, infer U from Promise.
   T extends (...args: any[]) => Promise<infer U>
-    ? U
-    // If T is a function, infer U from its return type
+    ? U // If T is a function, infer U from its return type
     : T extends (...args: any[]) => infer U
-      ? U
-      // If T is just a promise, infer U.
-      : T extends Promise<infer U>
-        ? U
-        : T
-// tslint:enable:no-shadowed-variable
+    ? U // If T is just a promise, infer U.
+    : T extends Promise<infer U>
+    ? U
+    : T
 
 export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>
 
@@ -45,14 +38,14 @@ export type ActionSuccessType<
   F extends (...args: any[]) => { payload: any }
 > = Omit<ReturnType<F>, 'payload'> & {
   payload: PayloadType<ReturnType<F>['payload']>
-  error: false,
+  error: false
 }
 
 export type ActionErrorType<
   F extends (...args: any[]) => { payload: any }
 > = Omit<ReturnType<F>, 'payload'> & {
   payload: string
-  error: true,
+  error: true
 }
 
 const defaultOptions: MiddlewareOptions = {
@@ -79,7 +72,9 @@ function isPromise(promiseLike: any): boolean {
 /**
  * Middleware adding native async / await support to Redux.
  */
-export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middleware {
+export default function asyncAwaitMiddleware(
+  options?: MiddlewareOptions,
+): Middleware {
   // Merge given options and our defaults.
   let opts: MiddlewareOptions = defaultOptions
 
@@ -102,10 +97,10 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      */
     function shouldSkipOuter() {
       if (
-        action
-        && action.meta
-        && action.meta.asyncPayload
-        && action.meta.asyncPayload.skipOuter
+        action &&
+        action.meta &&
+        action.meta.asyncPayload &&
+        action.meta.asyncPayload.skipOuter
       ) {
         return true
       }
@@ -174,16 +169,11 @@ export default function asyncAwaitMiddleware(options?: MiddlewareOptions): Middl
      * the original error.
      */
     function attachHandlers(promise: Promise<any>): Promise<any> {
-      return promise
-        .then(dispatchFulfilledAction)
-        .catch(dispatchRejectedAction)
+      return promise.then(dispatchFulfilledAction).catch(dispatchRejectedAction)
     }
 
     // Return if there is no action or payload.
-    if (
-      !action
-      || !action.payload
-    ) {
+    if (!action || !action.payload) {
       return dispatch(action)
     }
 

@@ -26,10 +26,10 @@ const logger: Middleware = () => (dispatch) => (action) => {
 export const createWithMiddleware = (
   reducer: Reducer<any, AnyAction>,
 ): Store<any, AnyAction> => {
-  return createStore(reducer, applyMiddleware(
-    middleware(),
-    logger,
-  ))
+  return createStore(
+    reducer,
+    applyMiddleware(middleware({ throwOriginalError: false }), logger),
+  )
 }
 
 export function clearActionHistory() {

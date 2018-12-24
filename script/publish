@@ -6,4 +6,4 @@ rm -rf lib/
 CI=true ./script/test
 ./node_modules/.bin/tsc
 
-npm publish
+npm publish --registry https://registry.npmjs.org/

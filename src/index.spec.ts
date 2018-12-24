@@ -1,5 +1,7 @@
 import * as assert from 'assert'
+import { ActionErrorType, ActionSuccessType } from 'index'
 import { Dispatch } from 'redux'
+
 import {
   clearActionHistory,
   createWithMiddleware,
@@ -172,23 +174,17 @@ describe('Async/Await Middleware', () => {
   describe('Error', () => {
     it('Works with function payload', async () => {
       const store = createWithMiddleware((state) => state)
-      let didCatchError = false
 
-      try {
-        await store.dispatch({
-          type: 'foo',
-          payload(dispatch: Dispatch<any>) {
-            dispatch({ type: 'OMG' })
-            throw new Error('the error message')
-          },
-        })
-      } catch (err) {
-        didCatchError = true
-      }
+      await store.dispatch({
+        type: 'foo',
+        payload(dispatch: Dispatch<any>) {
+          dispatch({ type: 'OMG' })
+          throw new Error('the error message')
+        },
+      })
 
       const actionHistory = getActionHistory()
 
-      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 3)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',
@@ -208,20 +204,14 @@ describe('Async/Await Middleware', () => {
 
     it('Works with a promise payload', async () => {
       const store = createWithMiddleware((state) => state)
-      let didCatchError = false
 
-      try {
-        await store.dispatch({
-          type: 'foo',
-          payload: Promise.reject(new Error('the error message')),
-        })
-      } catch (err) {
-        didCatchError = true
-      }
+      await store.dispatch({
+        type: 'foo',
+        payload: Promise.reject(new Error('the error message')),
+      })
 
       const actionHistory = getActionHistory()
 
-      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',
@@ -238,25 +228,19 @@ describe('Async/Await Middleware', () => {
 
     it('Works with an async function', async () => {
       const store = createWithMiddleware((state) => state)
-      let didCatchError = false
 
-      try {
-        await store.dispatch({
-          type: 'foo',
-          async payload(dispatch: Dispatch<any>) {
-            const result = await Promise.reject(new Error('the error message'))
-            dispatch({ type: 'OMG', payload: result })
+      await store.dispatch({
+        type: 'foo',
+        async payload(dispatch: Dispatch<any>) {
+          const result = await Promise.reject(new Error('the error message'))
+          dispatch({ type: 'OMG', payload: result })
 
-            return 'foo'
-          },
-        })
-      } catch (err) {
-        didCatchError = true
-      }
+          return 'foo'
+        },
+      })
 
       const actionHistory = getActionHistory()
 
-      assert.ok(didCatchError)
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
         type: 'foo/start',
@@ -269,6 +253,48 @@ describe('Async/Await Middleware', () => {
         error: true,
         meta: undefined,
       })
+    })
+  })
+
+  describe('dispatch()', () => {
+    it('can be cast to ActionSuccessType', async () => {
+      const store = createWithMiddleware((state) => state)
+
+      const action = () => ({
+        type: 'foo',
+        payload(dispatch: Dispatch<any>) {
+          dispatch({ type: 'OMG' })
+
+          return 'foo'
+        },
+      })
+
+      const result = ((await store.dispatch(
+        action(),
+      )) as any) as ActionSuccessType<typeof action>
+
+      assert.strictEqual(result.type, 'foo/success')
+      assert.strictEqual(result.payload, 'foo')
+      assert.strictEqual(result.error, false)
+    })
+
+    it('can be cast to ActionErrorType', async () => {
+      const store = createWithMiddleware((state) => state)
+
+      const action = () => ({
+        type: 'foo',
+        payload() {
+          throw new Error()
+        },
+      })
+
+      const result = ((await store.dispatch(
+        action(),
+      )) as any) as ActionErrorType<typeof action>
+
+      assert.strictEqual(result.type, 'foo/error')
+      assert.strictEqual(result.payload, 'Error')
+      assert.strictEqual(result.error, true)
     })
   })
 })
