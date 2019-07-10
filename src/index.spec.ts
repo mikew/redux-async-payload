@@ -1,7 +1,13 @@
 import * as assert from 'assert'
-import { ActionErrorType, ActionSuccessType } from 'index'
 import { Dispatch } from 'redux'
 
+import {
+  ActionErrorType,
+  ActionSuccessType,
+  errorActionType,
+  startActionType,
+  successActionType,
+} from './index'
 import {
   clearActionHistory,
   createWithMiddleware,
@@ -36,7 +42,7 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 3)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
@@ -44,13 +50,13 @@ describe('Async/Await Middleware', () => {
         type: 'OMG',
       })
       assert.deepStrictEqual(actionHistory[2], {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
       })
       assert.deepStrictEqual(result, {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
@@ -85,18 +91,18 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
       assert.deepStrictEqual(actionHistory[1], {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
       })
       assert.deepStrictEqual(result, {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
@@ -120,7 +126,7 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 3)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
@@ -129,13 +135,13 @@ describe('Async/Await Middleware', () => {
         payload: 42,
       })
       assert.deepStrictEqual(actionHistory[2], {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
       })
       assert.deepStrictEqual(result, {
-        type: 'foo/success',
+        type: successActionType('foo'),
         payload: 'foo',
         error: false,
         meta: undefined,
@@ -187,7 +193,7 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 3)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
@@ -195,7 +201,7 @@ describe('Async/Await Middleware', () => {
         type: 'OMG',
       })
       assert.deepStrictEqual(actionHistory[2], {
-        type: 'foo/error',
+        type: errorActionType('foo'),
         payload: 'the error message',
         error: true,
         meta: undefined,
@@ -214,12 +220,12 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
       assert.deepStrictEqual(actionHistory[1], {
-        type: 'foo/error',
+        type: errorActionType('foo'),
         payload: 'the error message',
         error: true,
         meta: undefined,
@@ -243,12 +249,12 @@ describe('Async/Await Middleware', () => {
 
       assert.equal(actionHistory.length, 2)
       assert.deepStrictEqual(actionHistory[0], {
-        type: 'foo/start',
+        type: startActionType('foo'),
         error: undefined,
         meta: undefined,
       })
       assert.deepStrictEqual(actionHistory[1], {
-        type: 'foo/error',
+        type: errorActionType('foo'),
         payload: 'the error message',
         error: true,
         meta: undefined,
@@ -273,7 +279,7 @@ describe('Async/Await Middleware', () => {
         action(),
       )) as any) as ActionSuccessType<typeof action>
 
-      assert.strictEqual(result.type, 'foo/success')
+      assert.strictEqual(result.type, successActionType('foo'))
       assert.strictEqual(result.payload, 'foo')
       assert.strictEqual(result.error, false)
     })
@@ -292,7 +298,7 @@ describe('Async/Await Middleware', () => {
         action(),
       )) as any) as ActionErrorType<typeof action>
 
-      assert.strictEqual(result.type, 'foo/error')
+      assert.strictEqual(result.type, errorActionType('foo'))
       assert.strictEqual(result.payload, 'Error')
       assert.strictEqual(result.error, true)
     })

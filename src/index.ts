@@ -129,6 +129,18 @@ export default function asyncAwaitMiddleware(
   }
 }
 
+export function startActionType(type: string) {
+  return `${type}${currentOptions.delimiter}${currentOptions.suffixes!.start}`
+}
+
+export function successActionType(type: string) {
+  return `${type}${currentOptions.delimiter}${currentOptions.suffixes!.success}`
+}
+
+export function errorActionType(type: string) {
+  return `${type}${currentOptions.delimiter}${currentOptions.suffixes!.error}`
+}
+
 /**
  * Checks if the argument given is a Promise or Promise-like object.
  */

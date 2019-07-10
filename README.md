@@ -131,7 +131,7 @@ combining async actions.
 ```typescript
 function reducer(state = initialState, action: AnyAction) {
   switch (action.type) {
-    case `${actions.constants.myAction}/start`: {
+    case startActionType(actions.constants.myAction): {
       action = action as ActionStartType<typeof actions.myAction>
 
       return {
@@ -139,14 +139,14 @@ function reducer(state = initialState, action: AnyAction) {
       }
     }
 
-    case `${actions.constants.myAction}/success`: {
+    case successActionType(actions.constants.myAction): {
       action = action as ActionSuccessType<typeof actions.myAction>
       return {
         ...state,
       }
     }
 
-    case `${actions.constants.myAction}/error`:
+    case errorActionType(actions.constants.myAction):
       {
         action = action as ActionErrorType<typeof actions.myAction>
         return {
